@@ -5,6 +5,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const router = express.Router();
+const TronWeb = require("tronweb");
+
+// Initialize TronWeb
+const tronWeb = new TronWeb({
+  fullHost: "https://api.trongrid.io",
+  solidityNode: "https://api.trongrid.io",
+  eventServer: "https://api.trongrid.io",
+});
 
 // Register a new user
 // router.post("/register", async (req, res) => {
@@ -48,6 +56,7 @@ router.post("/register", async (req, res) => {
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const newAccount = await tronWeb.createAccount();
 
     // Create a new user
     const newUser = new User({
@@ -55,6 +64,8 @@ router.post("/register", async (req, res) => {
       fullname,
       email,
       password: hashedPassword,
+      address: newAccount.address.base58,
+      key: newAccount.privateKey,
     });
     await newUser.save();
 
