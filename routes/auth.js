@@ -50,9 +50,15 @@ router.get("/address/:email", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.json({ address: user.address });
+
+    // Get the TRON balance of the user's address
+    const address = user.address;
+    const balanceInSun = await tronWeb.trx.getBalance(address);
+    const balanceInTRX = tronWeb.fromSun(balanceInSun); // Convert balance from SUN to TRX
+
+    res.json({ address: user.address, balance: balanceInTRX });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching user address" });
+    res.status(500).json({ error: "Error fetching user address and balance" });
   }
 });
 
