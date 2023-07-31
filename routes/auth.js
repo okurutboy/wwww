@@ -43,6 +43,18 @@ const tronWeb = new TronWeb({
 //     res.status(500).json({ error: "Internal server error" });
 //   }
 // });
+router.get("/address/:email", async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email }, { address: 1 });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ address: user.address });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching user address" });
+  }
+});
 
 router.post("/register", async (req, res) => {
   const { username, fullname, email, password } = req.body;
